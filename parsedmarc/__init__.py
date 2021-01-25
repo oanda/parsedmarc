@@ -30,6 +30,7 @@ from mailsuite.imap import IMAPClient
 from mailsuite.smtp import send_email
 from imapclient.exceptions import IMAPClientError
 
+from parsedmarc.imapwrapper import ImapWrapper
 from parsedmarc.utils import get_base_domain, get_ip_address_info
 from parsedmarc.utils import is_outlook_msg, convert_outlook_msg
 from parsedmarc.utils import timestamp_to_human, human_timestamp_to_datetime
@@ -972,7 +973,7 @@ def get_imap_capabilities(server):
     Returns a list of an IMAP server's capabilities
 
     Args:
-        server (imapclient.IMAPClient): An instance of imapclient.IMAPClient
+        server (ImapWrapper): An instance of ImapWrapper
 
     Returns (list): A list of capabilities
     """
@@ -1009,7 +1010,7 @@ def get_dmarc_reports_from_inbox(connection=None,
     Fetches and parses DMARC reports from an inbox
 
     Args:
-        connection: An IMAPClient connection to reuse
+        connection: An ImapWrapper connection to reuse
         host: The mail server hostname or IP address
         user: The mail server user
         password: The mail server password
@@ -1054,11 +1055,11 @@ def get_dmarc_reports_from_inbox(connection=None,
     if connection:
         server = connection
     else:
-        server = IMAPClient(host, user, password, port=port,
-                            ssl=ssl, verify=verify,
-                            timeout=timeout,
-                            max_retries=max_retries,
-                            initial_folder=reports_folder)
+        server = ImapWrapper(host, user, password, port=port,
+                             ssl=ssl, verify=verify,
+                             timeout=timeout,
+                             max_retries=max_retries,
+                             initial_folder=reports_folder)
 
     server.create_folder(archive_folder)
     server.create_folder(aggregate_reports_folder)
@@ -1227,11 +1228,11 @@ def watch_inbox(host, username, password, callback, port=None, ssl=True,
 
     while True:
         try:
-            IMAPClient(host=host, username=username, password=password,
-                       port=port, ssl=ssl, verify=verify,
-                       initial_folder=reports_folder,
-                       idle_callback=idle_callback,
-                       idle_timeout=idle_timeout)
+            ImapWrapper(host=host, username=username, password=password,
+                        port=port, ssl=ssl, verify=verify,
+                        initial_folder=reports_folder,
+                        idle_callback=idle_callback,
+                        idle_timeout=idle_timeout)
         except (timeout, IMAPClientError):
             logger.warning("IMAP connection timeout. Reconnecting...")
 
