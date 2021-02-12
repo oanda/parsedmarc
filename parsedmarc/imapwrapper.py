@@ -47,7 +47,9 @@ class ImapWrapper:
                                      verify=self.verify,
                                      timeout=self.timeout,
                                      max_retries=self.max_retries,
-                                     initial_folder=self.initial_folder)
+                                     initial_folder=self.initial_folder,
+                                     idle_callback=self.idle_callback,
+                                     idle_timeout=self.idle_timeout)
 
     def move_messages(self, msg_uids, folder_path, _attempt=1):
         self._connect()
